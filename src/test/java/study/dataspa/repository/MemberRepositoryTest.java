@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
@@ -209,6 +210,31 @@ public class MemberRepositoryTest {
         member.setUsername("member2");
 
         em.flush();
+    }
+
+    @Test
+    public void callCustom() {
+        List<Member> result = memberRepository.findMemberCustom();
+    }
+
+    @Test
+    public void projections() {
+        Team teamA = new Team("teamA");
+        teamRepository.save(teamA);
+
+        memberRepository.save(new Member("member1", 0, teamA));
+        memberRepository.save(new Member("member2", 0, teamA));
+        em.flush();
+        em.clear();
+
+        //when
+        List<Member> members = memberRepository.findAll();
+
+        //then
+        for (Member member : members) {
+            member.getTeam().getName();
+        }
+
     }
 
 }
